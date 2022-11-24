@@ -11,6 +11,7 @@ module.exports = {
   lintOnSave: true, // 是否开启eslint保存检测
   productionSourceMap: false, // 是否在构建生产包时生成sourcdeMap
   chainWebpack: config => {
+    config.module.rules.delete('eslint');
     config.resolve.alias
       .set('@', resolve('src'))
       .set('views', resolve('src/views'))

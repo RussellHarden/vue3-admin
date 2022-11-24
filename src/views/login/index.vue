@@ -27,19 +27,26 @@
           <i class="el-icon-key"></i>
         </div>
         <el-form ref="loginForm" :rules="rules" :model="ruleForm">
-          <el-form-item prop="user">
+          <el-form-item prop="account">
             <el-input
               placeholder="请输入账号"
               prefix-icon="el-icon-user"
-              v-model="ruleForm.user"
+              v-model="ruleForm.account"
             ></el-input>
           </el-form-item>
-          <el-form-item prop="password">
+          <el-form-item prop="pwd">
             <el-input
               placeholder="请输入密码"
               prefix-icon="el-icon-lock"
-              v-model="ruleForm.password"
+              v-model="ruleForm.pwd"
               show-password
+            ></el-input>
+          </el-form-item>
+          <el-form-item prop="code">
+            <el-input
+              placeholder="请输入答案"
+              prefix-icon="el-icon-code"
+              v-model="ruleForm.code"              
             ></el-input>
           </el-form-item>
           <el-button
@@ -56,27 +63,40 @@
 
 <script>
 import SlideVerify from '@/components/SlideVerify'
+import { getCode } from '@/api/login'
 export default {
   data() {
     return {
       notifyObj: null,
       text: '向右滑动',
       showSlide: false,
+      codeConfig: {
+        code: 1,
+        num: 7,
+        num_2: 8
+      },
       ruleForm: {
-        user: 'admin',
-        password: '123456'
+        account: 'root',
+        pwd: 'wcxzdy1100',
+        code:"",
+        uuid:"uuid"
       },
       rules: {
         user: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 15, message: '长度在3到5个字符', trigger: 'blur' }
         ],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        code: [{default:0, required: true, message: '请输入答案', trigger: 'blur' }]
       }
     }
   },
+  created() {
+    this._getCode()
+  },
   mounted() {
     this.shopTip()
+    this.showCodeConfig()
   },
   methods: {
     onSuccess() {
@@ -92,7 +112,7 @@ export default {
     loginYz(form) {
       this.$refs[form].validate(valid => {
         if (valid) {
-          this.showSlide = true
+          this._login()
         } else {
           return
         }
@@ -125,6 +145,18 @@ export default {
         duration: 0,
         iconClass: 'el-icon-s-opportunity'
       })
+    },
+    _getCode() {
+      getCode()
+        .then(res => {
+          this.codeConfig = res.data
+        })
+        .catch(error => {
+          this.$message.error(error.message)
+        })
+    },
+    showCodeConfig() {
+      return 1
     }
   },
   components: {

@@ -34,6 +34,7 @@ const actions = {
   // user login
   _login({ commit }, formdatas) {
     return new Promise((resolve, reject) => {
+      formdatas.code = Number(formdatas.code)
       login(formdatas)
         .then(res => {
           if (res.code === 0) {

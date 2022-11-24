@@ -3,17 +3,9 @@
     <div class="slideShadow" v-show="showSlide">
       <transition>
         <div class="slideSty animated bounce">
-          <slide-verify
-            @success="onSuccess"
-            @fail="onFail"
-            :sliderText="text"
-            :w="350"
-            :h="175"
-            ref="slideDiv"
-          ></slide-verify>
+          <slide-verify @success="onSuccess" @fail="onFail" :sliderText="text" :w="350" :h="175" ref="slideDiv"></slide-verify>
           <div class="iconBtn">
-            <i class="el-icon-circle-close" @click="showSlide = false"></i
-            ><i class="el-icon-refresh" @click="refresh"></i>
+            <i class="el-icon-circle-close" @click="showSlide = false"></i><i class="el-icon-refresh" @click="refresh"></i>
           </div>
         </div>
       </transition>
@@ -28,33 +20,18 @@
         </div>
         <el-form ref="loginForm" :rules="rules" :model="ruleForm">
           <el-form-item prop="account">
-            <el-input
-              placeholder="请输入账号"
-              prefix-icon="el-icon-user"
-              v-model="ruleForm.account"
-            ></el-input>
+            <el-input placeholder="请输入账号" prefix-icon="el-icon-user" v-model="ruleForm.account"></el-input>
           </el-form-item>
           <el-form-item prop="pwd">
-            <el-input
-              placeholder="请输入密码"
-              prefix-icon="el-icon-lock"
-              v-model="ruleForm.pwd"
-              show-password
-            ></el-input>
+            <el-input placeholder="请输入密码" prefix-icon="el-icon-lock" v-model="ruleForm.pwd" show-password></el-input>
+          </el-form-item>
+          <el-form-item prop="code111">
+            <p>{{ showCodeTip }}</p>
           </el-form-item>
           <el-form-item prop="code">
-            <el-input
-              placeholder="请输入答案"
-              prefix-icon="el-icon-code"
-              v-model="ruleForm.code"              
-            ></el-input>
+            <el-input placeholder="请输入答案" prefix-icon="el-icon-code" v-model="ruleForm.code"></el-input>
           </el-form-item>
-          <el-button
-            type="primary"
-            class="loginBtn"
-            @click="loginYz('loginForm')"
-            >登录</el-button
-          >
+          <el-button type="primary" class="loginBtn" @click="loginYz('loginForm')">登录</el-button>
         </el-form>
       </div>
     </div>
@@ -62,107 +39,129 @@
 </template>
 
 <script>
-import SlideVerify from '@/components/SlideVerify'
-import { getCode } from '@/api/login'
+import SlideVerify from "@/components/SlideVerify";
+import { getCode } from "@/api/login";
 export default {
   data() {
     return {
       notifyObj: null,
-      text: '向右滑动',
+      text: "向右滑动",
       showSlide: false,
       codeConfig: {
         code: 1,
         num: 7,
-        num_2: 8
+        num_2: 8,
       },
       ruleForm: {
-        account: 'root',
-        pwd: 'wcxzdy1100',
-        code:"",
-        uuid:"uuid"
+        account: "root",
+        pwd: "wcxzdy1100",
+        code: "",
+        uuid: "uuid",
       },
       rules: {
         user: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 15, message: '长度在3到5个字符', trigger: 'blur' }
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 3, max: 15, message: "长度在3到5个字符", trigger: "blur" },
         ],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        code: [{default:0, required: true, message: '请输入答案', trigger: 'blur' }]
-      }
-    }
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        code: [{ default: 0, required: true, message: "请输入答案", trigger: "blur" }],
+      },
+    };
   },
   created() {
-    this._getCode()
+    this._getCode();
   },
   mounted() {
-    this.shopTip()
-    this.showCodeConfig()
+    this.shopTip();
+    this.showCodeConfig();
   },
+  computed: {
+    // 一个计算属性的 getter
+    showCodeTip() {
+      // `this` 指向当前组件实例
+      let str = " + ";
+      switch (this.codeConfig.code) {
+        case 0:
+          str = " + ";
+          break;
+        case 1:
+          str = " - ";
+          break;
+        case 2:
+          str = " * ";
+          break;
+        case 3:
+          str = " / ";
+          break;
+      }
+      return "" + this.codeConfig.num + str + this.codeConfig.num_2 + " = ?";
+    },
+  },
+
   methods: {
     onSuccess() {
-      this.showSlide = false
-      this._login()
+      this.showSlide = false;
+      this._login();
     },
     onFail() {
-      this.$message.error('验证失败')
+      this.$message.error("验证失败");
     },
     refresh() {
-      this.$refs.slideDiv.reset()
+      this.$refs.slideDiv.reset();
     },
     loginYz(form) {
-      this.$refs[form].validate(valid => {
+      this.$refs[form].validate((valid) => {
         if (valid) {
-          this._login()
+          this._login();
         } else {
-          return
+          return;
         }
-      })
+      });
     },
     _login() {
       this.$store
-        .dispatch('user/_login', this.ruleForm)
-        .then(res => {
+        .dispatch("user/_login", this.ruleForm)
+        .then((res) => {
           if (!res.data.success) {
-            this.refresh()
+            this.refresh();
           } else {
-            this.$router.push(this.$route.query.redirect)
+            this.$router.push(this.$route.query.redirect);
             if (this.notifyObj) {
-              this.notifyObj.close()
+              this.notifyObj.close();
             }
-            this.notifyObj = null
+            this.notifyObj = null;
           }
         })
-        .catch(error => {
-          this.refresh()
-          this.$message.error(error)
-        })
+        .catch((error) => {
+          this.refresh();
+          this.$message.error(error);
+        });
     },
     shopTip() {
-      this.notifyObj = this.$notify({
-        title: '提示',
-        message:
-          '目前有两个登陆角色，管理员和普通用户，账号分别为：admin、user,密码都为：123456',
-        duration: 0,
-        iconClass: 'el-icon-s-opportunity'
-      })
+      // this.notifyObj = this.$notify({
+      //   title: "提示",
+      //   message: "目前有两个登陆角色，管理员和普通用户，账号分别为：admin、user,密码都为：123456",
+      //   duration: 0,
+      //   iconClass: "el-icon-s-opportunity",
+      // });
     },
     _getCode() {
       getCode()
-        .then(res => {
-          this.codeConfig = res.data
+        .then((res) => {
+          this.codeConfig = res.data;
         })
-        .catch(error => {
-          this.$message.error(error.message)
-        })
+        .catch((error) => {
+          this.$message.error(error.message);
+        });
     },
     showCodeConfig() {
-      return 1
-    }
+      return 1;
+    },
   },
   components: {
-    SlideVerify
-  }
-}
+    SlideVerify,
+  },
+};
 </script>
 <style scoped lang="scss">
 .login {
